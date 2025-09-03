@@ -1,0 +1,29 @@
+def train_model(model, optimizer, steps=2000):
+    losses = []
+    for step in range(steps):
+        # Forward pass
+        predictions = model(X_train)
+        
+        # Compute loss (Mean Squared Error)
+        loss = nn.functional.mse_loss(predictions, y_train)
+        
+        # Backward pass and optimization
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        
+        losses.append(loss.item())
+        if (step + 1) % 500 == 0:
+            print(f"Step [{step+1}/{steps}], Loss: {loss.item():.6f}")
+    return losses, model
+
+# --- Train the IDEAL model ---
+print("--- Training IDEAL Model (Perfect Hardware) ---")
+ideal_model = Actor(use_hat=False)
+ideal_optimizer = torch.optim.Adam(ideal_model.parameters(), lr=0.001)
+ideal_losses, ideal_model = train_model(ideal_model, ideal_optimizer)
+
+print("\n--- Training RICC-HAT Model (Noisy Hardware) ---")
+hat_model = Actor(use_hat=True)
+hat_optimizer = torch.optim.Adam(hat_model.parameters(), lr=0.001)
+hat_losses, hat_model = train_model(hat_model, hat_optimizer)
