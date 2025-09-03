@@ -1,1 +1,1 @@
-# A-Self-Improving-Microsystem-Enabled-by-a-Cognitive-Reinforcement-Learning-Core.
+# RICC-HAT-Cognitive-Electronics
