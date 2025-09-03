@@ -1,0 +1,31 @@
+import torch
+import torch.nn as nn
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Import our hardware model
+from src.hat_framework import stochastic_forward_pass
+
+# Define a simple Actor network
+class Actor(nn.Module):
+    def __init__(self, use_hat=False):
+        super(Actor, self).__init__()
+        self.use_hat = use_hat
+        self.layer1 = nn.Linear(1, 64)
+        self.layer2 = nn.Linear(64, 64)
+        self.layer3 = nn.Linear(64, 1)
+
+    def forward(self, x):
+        if self.use_hat:
+            x = torch.relu(stochastic_forward_pass(self.layer1, x))
+            x = torch.relu(stochastic_forward_pass(self.layer2, x))
+            # The last layer is often kept ideal for stability, but could also be stochastic
+            x = torch.tanh(self.layer3(x)) 
+        else: # Ideal pass
+            x = torch.relu(self.layer1(x))
+            x = torch.relu(self.layer2(x))
+            x = torch.tanh(self.layer3(x))
+        return x
+
+# Set plot style
+plt.style.use('seaborn-v0_8-whitegrid')
