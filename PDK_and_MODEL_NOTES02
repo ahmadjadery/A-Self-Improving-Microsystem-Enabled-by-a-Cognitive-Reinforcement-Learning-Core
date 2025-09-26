@@ -1,0 +1,105 @@
+# RICC-HAT: Simplified Behavioral Models and Methodological Notes
+
+**Disclaimer:** This document does **not** constitute a full Process Design Kit (PDK). A PDK is a complex, foundry-specific set of proprietary models and rules. Instead, this document provides a collection of simplified, high-level **behavioral models and methodological notes** to support the reproducibility and understanding of the concepts presented in our paper, "Resilience that Learns." These models are intended for educational and conceptual verification purposes.
+
+---
+
+### 1. Conceptual SPICE Compact Model for a ReRAM Cell
+
+To enable system-level simulations and validate the concepts discussed in **Supplementary Note S7**, a simplified compact model for the ReRAM device is essential. The following SPICE `.model` card represents a first-order behavioral model capturing the key characteristics of the devices fabricated in our **28nm CMOS process**. It reflects a nominal supply voltage of 1.0V and includes parameters for programming pulse dynamics, serving as a robust starting point for physics-based modeling.
+
+```spice
+* --- Conceptual SPICE Behavioral Model for a 28nm HfOx ReRAM Cell ---
+.MODEL RICC_RRAM_CELL RES (
++ LEVEL    = 1                  ; Behavioral resistor model for transient simulation
++ R_ON     = 10k                ; Target Low-Resistance State (LRS) from Table S7
++ R_OFF    = 1.1M               ; Target High-Resistance State (HRS) from Table S7
++ PROG_V   = 1.1                ; Nominal SET voltage threshold (V) for 28nm
++ ERASE_V  = -1.0               ; Nominal RESET voltage threshold (V) for 28nm
++ PULSE_W  = 100n               ; Required pulse width for switching (ns)
++ V_RAMP   = 0.05               ; Voltage ramp sensitivity (V/ns) for gradual switching
++ VAR_ON   = 0.185              ; Lognormal sigma for R_on (matches Cell-to-Cell from Table S7)
++ VAR_OFF  = 0.320              ; Lognormal sigma for R_off (matches Cell-to-Cell from Table S7)
++ TEMP_C   = -250               ; First-order temperature coefficient (ppm/°C)
+)
+2. UVM-based Verification Concepts for the RICC
+As detailed in Supplementary Note S1.4, our work was validated using a modern co-simulation methodology. While a full UVM environment was beyond the scope of this prototype, our Python-based system-level testbench was inspired by UVM's coverage-driven principles. The conceptual SystemVerilog code below illustrates how a reram_array_agent and its associated functional coverage model would be structured to rigorously verify a future production-intent version of the RICC.
+// --- Conceptual UVM Agent and Functional Coverage Model ---
+class reram_array_agent extends uvm_agent;
+  
+  // Standard UVM components for generating stimuli and checking results
+  reram_driver    driver;
+  reram_monitor   monitor;
+  reram_sequencer sequencer;
+
+  // --- Functional Coverage ---
+  // Ensures that all critical operational scenarios are tested.
+  covergroup reram_coverage;
+    // Coverpoint for programming pulse voltages
+    prog_voltage_cp: coverpoint driver.t.prog_voltage {
+      bins low[]     = {[0.8:1.0]};      // Below nominal VDD
+      bins nominal[] = {[1.0:1.2]};      // At and slightly above VDD
+      bins high[]    = {[1.2:1.5]};      // Stress conditions
+    }
+    
+    // Coverpoint for programming pulse widths
+    pulse_width_cp: coverpoint driver.t.pulse_width {
+      bins narrow[] = {[50e-9:100e-9]};
+      bins wide[]   = {[100e-9:500e-9]};
+    }
+    
+    // Coverpoint for state transitions
+    state_transitions_cp: coverpoint monitor.t.state {
+      bins LRS_to_HRS = (LRS => HRS);
+      bins HRS_to_LRS = (HRS => LRS);
+    }
+    
+    // Cross coverage to test combinations of critical parameters
+    cross prog_voltage_cp, pulse_width_cp, state_transitions_cp;
+  endgroup
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+    reram_coverage = new();
+  endfunction
+
+endclass
+3. Concepts for a Self-Improving, Production-Ready ReRAM Array
+The passive crossbar array in this prototype was chosen for simplicity. A future generation of the RICC, evolving from a research prototype to a production-ready system, would embed the principles of self-improvement directly into the hardware. The conceptual Verilog module below illustrates advanced features that enable this evolution, such as on-chip wear-leveling and temperature compensation, which are the hardware enablers for the adaptive policy learned by the RICC.
+// --- Conceptual Verilog Module for a Self-Improving ReRAM Array ---
+module enhanced_reram_array #(
+  parameter ROWS = 128,
+  parameter COLS = 128
+) (
+  // System and DCNU Interface
+  input wire clk, reset,
+  input wire [7:0] row_addr, col_addr,
+  inout wire [7:0] data,
+  // ... control signals from DCNU
+
+  // On-chip Sensor Interface
+  input wire [7:0] temp_sensor_data 
+);
+
+  // --- Core Reliability & Self-Improvement Features ---
+
+  // 1. Wear Leveling Controller
+  // On-chip logic that translates logical addresses to physical addresses to
+  // distribute write cycles evenly across the array, maximizing endurance.
+  wear_level_ctrl wlc (
+    .logical_addr({row_addr, col_addr}),
+    .write_req(prog_en),
+    .physical_addr(physical_addr) // Remapped address
+  );
+  
+  // 2. Temperature Compensation Unit
+  // Dynamically adjusts programming pulse widths or voltages based on real-time
+  // on-die temperature data, ensuring stable operation across the full temp range.
+  temp_compensation_unit tcu (
+    .temp_sensor_data(temp_data),
+    .voltage_adjustment(prog_volt_adj) // Output feeds the write driver
+  );
+
+  // ... (instantiation of the core 1T1R ReRAM array with error correction)
+
+endmodule
