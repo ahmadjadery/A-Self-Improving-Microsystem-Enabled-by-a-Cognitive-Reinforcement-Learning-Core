@@ -1,0 +1,116 @@
+# RICC-HAT: Simplified Behavioral Models and PDK Notes
+
+**Disclaimer:** This document does **not** constitute a full Process Design Kit (PDK). A PDK is a complex, foundry-specific set of proprietary models and rules. Instead, this document provides a collection of simplified, high-level **behavioral models and methodological notes** to support the reproducibility and understanding of the concepts presented in our paper, "Resilience that Learns." These models are intended for educational and conceptual verification purposes.
+
+---
+
+### 1. Conceptual SPICE Compact Model for a ReRAM Cell
+
+To enable system-level simulations, a simplified compact model for the ReRAM device is essential. The following SPICE `.model` card represents a first-order behavioral model that captures the key characteristics of the devices used in our prototype, such as target resistances, programming voltages, and basic variability. It serves as a starting point for more complex physics-based models.
+
+```spice
+* --- Conceptual SPICE Behavioral Model for a 28nm HfOx ReRAM Cell ---
+.MODEL RICC_RRAM_CELL RES (
++ LEVEL    = 1                  ; Behavioral resistor model
++ R_ON     = 10k                ; Target Low-Resistance State (LRS)
++ R_OFF    = 1M                 ; Target High-Resistance State (HRS)
++ PROG_V   = 1.2                ; Nominal SET voltage threshold (V)
++ ERASE_V  = -1.0               ; Nominal RESET voltage threshold (V)
++ VAR_ON   = 0.18               ; Lognormal sigma for R_on variability
++ VAR_OFF  = 0.32               ; Lognormal sigma for R_off variability
++ TEMP_C   = -250               ; Temperature coefficient (ppm/°C)
+)
+```
+
+### 2. UVM-based Verification Concepts for the ReRAM Array
+
+Verifying the ReRAM array and its controller (the DCNU) requires a modern, coverage-driven methodology. While a full UVM environment was beyond the scope of this academic prototype, our Python-based testbench (see `train.py`) was inspired by UVM principles. The following conceptual `SystemVerilog` code illustrates how a `reram_array_agent` would be structured to rigorously verify the array's functionality.
+
+```systemverilog
+// --- Conceptual UVM Agent for ReRAM Array Verification ---
+class reram_array_agent extends uvm_agent;
+  
+  // Standard UVM components: driver, monitor, sequencer
+  reram_driver    driver;
+  reram_monitor   monitor;
+  reram_sequencer sequencer;
+
+  // --- Functional Coverage Model ---
+  // This is used to ensure all important scenarios are tested.
+  covergroup reram_coverage;
+    // Coverpoint for programming voltages
+    prog_voltage_cp: coverpoint driver.t.prog_voltage {
+      bins low[]     = {[0.8:1.0]};
+      bins nominal[] = {[1.0:1.4]};
+      bins high[]    = {[1.4:1.8]};
+    }
+    
+    // Coverpoint for state transitions
+    state_transitions_cp: coverpoint monitor.t.state {
+      bins LRS_to_HRS = (LRS => HRS);
+      bins HRS_to_LRS = (HRS => LRS);
+      bins LRS_to_LRS = (LRS => LRS); // Verify non-disturbance
+    }
+    
+    // Cross coverage to test voltages vs. transitions
+    cross prog_voltage_cp, state_transitions_cp;
+  endgroup
+
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+    reram_coverage = new();
+  endfunction
+
+endclass
+```
+
+### 3. Concepts for an Advanced, Production-Ready ReRAM Array
+
+The passive crossbar array used in this prototype was chosen for simplicity. A future, production-ready version of the RICC would incorporate more advanced features directly into the hardware to manage reliability and yield at scale. The following conceptual `Verilog` module illustrates some of these features, such as built-in error correction, wear-leveling, and temperature compensation.
+
+```verilog
+// --- Conceptual Verilog Module for an Enhanced ReRAM Array ---
+module enhanced_reram_array #(
+  parameter ROWS = 128,
+  parameter COLS = 128,
+  parameter ECC_BITS = 8
+) (
+  // System Interface
+  input wire clk, reset,
+  input wire [7:0] row_addr, col_addr,
+  input wire prog_en, read_en,
+  inout wire [7:0] data,
+  // ... other control signals
+);
+
+  // --- Core Reliability Features ---
+
+  // 1. Built-in Error Correction (ECC)
+  // Detects and corrects single-bit errors during read operations.
+  wire [ECC_BITS-1:0] ecc_syndrome;
+  wire error_detected, error_corrected;
+  // (Instantiation of an ECC logic block would be here)
+
+  // 2. Wear Leveling Controller
+  // Maps logical addresses to physical addresses to distribute write cycles evenly.
+  wear_level_ctrl wlc (
+    .logical_addr({row_addr, col_addr}),
+    .write_req(prog_en),
+    .physical_addr(physical_addr)
+  );
+  
+  // 3. Temperature Compensation Unit
+  // Adjusts programming pulse widths or voltages based on on-die temperature.
+  temp_compensation_unit tcu (
+    .temp_sensor_data(temp_data),
+    .voltage_adjustment(prog_volt_adj)
+  );
+
+  // ... (instantiation of the core ReRAM array)
+
+endmodule
+```
+
+---
+
+This collection of models and notes provides a deeper insight into the design and verification methodologies that underpin our work, establishing a clear path from our research prototype to future, production-ready cognitive systems.
