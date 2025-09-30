@@ -1,6 +1,6 @@
 # Official Code and Data for "Resilience that Learns: A Self-Improving Microsystem..."
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1234567.svg)](https://doi.org/10.5281/zenodo.1234567) <!-- TODO: Replace with your actual Zenodo or paper DOI after publication -->
+[![DOI](https://zenodo.org/badge/1049977359.svg)](https://doi.org/10.5281/zenodo.17233035) <!-- TODO: Replace with your actual Zenodo or paper DOI after publication -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This repository contains the official code, simulation models, and data necessary to reproduce the key findings of our paper submitted to *Nature Electronics*, titled "Resilience that Learns: A Self-Improving Microsystem Enabled by a Cognitive Reinforcement Learning Core." 
