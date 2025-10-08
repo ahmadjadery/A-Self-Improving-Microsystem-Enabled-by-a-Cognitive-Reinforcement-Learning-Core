@@ -75,7 +75,7 @@ jupyter notebook
 
 ## Citation
 If you find this work useful for your research, please cite our paper:
-> **[Your Full, Final Citation From Nature Electronics Will Go Here After Acceptance]**
+> **[my Full, Final Citation From Nature Electronics Will Go Here After Acceptance]**
 
 ## License
 This work is licensed under the MIT License. See the `LICENSE` file for details.
