@@ -5,7 +5,15 @@
 
 This repository contains the official code, simulation models, and data necessary to reproduce the key findings of our paper submitted to *Nature Electronics*, titled "Resilience that Learns: A Self-Improving Microsystem Enabled by a Cognitive Reinforcement Learning Core." 
 
+
 Our work introduces a self-improving microsystem fabricated in a 28nm process that achieves state-of-the-art resilience. This repository is designed to provide full transparency and enable the community to build upon, validate, and extend our results.
+
+### **Key Validated Results**
+
+![Key Results Thumbnail](thumbnail.png) 
+*<p align="center"><b>Left:</b> Statistical validation of the 19.8 fs typical RMS jitter (TT Corner). <b>Right:</b> Measured 8 Gb/s eye diagram demonstrating robust link performance.</p>*
+
+
 
 ### Key Experimental Result: Sim-to-Real Correlation
 
