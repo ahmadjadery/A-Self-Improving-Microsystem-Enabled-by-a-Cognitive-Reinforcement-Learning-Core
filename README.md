@@ -16,7 +16,7 @@ This repository provides the tools to reproduce the central experimental finding
 | **Statistical Jitter Validation** | **Sim-to-Real Model Correlation** |
 |:---:|:---:|
 | ![Jitter Histogram Thumbnail](histogram_thumbnail.png) | ![Correlation Plot Thumbnail](correlation_plot.png) |
-| *(a) Statistical validation of the **19.8 fs typical RMS jitter** (TT Corner) from 1,000 measured waveforms. The data confirms a well-behaved Gaussian distribution, matching our manuscript claims.* | *(b) Scatter plot of measured versus HAT-predicted RMS jitter across multiple process corners, demonstrating an **R² > 0.97**. This validates the "digital twin's" high predictive accuracy.* |
+| *(a) Statistical validation of the **19.8 fs typical RMS jitter** (TT Corner) from 1,000 measured waveforms. The data confirms a well-behaved Gaussian distribution, matching our manuscript claims.* | *(b) HAT Agent Performance: Before and After Self-Adaptation* |
 
 ---
 
