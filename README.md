@@ -19,9 +19,8 @@ Our work introduces a self-improving microsystem fabricated in a 28nm process th
 
 The core of our validation is the exceptional correlation between our Hardware-Aware Training (HAT) simulation and measured silicon performance. The following plot, generated from the code in this repository, demonstrates this key finding.
 
-![Sim-to-Real Correlation Plot](https://path/to/your/figure5/image.png) 
-<!-- TODO: Replace this URL with a direct link to the Figure 5 image file in your repository -->
-*Figure: Measured vs. Predicted RMS Jitter, demonstrating R² > 0.97.*
+![Sim-to-Real Correlation Plot](correlation_plot.png) 
+*<p align="center">Figure: Measured vs. Predicted RMS Jitter, demonstrating R² > 0.97.</p>*
 
 ---
 
