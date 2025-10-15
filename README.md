@@ -8,19 +8,15 @@ This repository contains the official code, simulation models, and data necessar
 
 Our work introduces a self-improving microsystem fabricated in a 28nm process that achieves state-of-the-art resilience. This repository is designed to provide full transparency and enable the community to build upon, validate, and extend our results.
 
-### **Key Validated Results**
+---
+### **Key Experimental Highlights**
 
-![Key Results Thumbnail](thumbnail.png) 
-*<p align="center"><b>Left:</b> Statistical validation of the 19.8 fs typical RMS jitter (TT Corner). <b>Right:</b> Measured 8 Gb/s eye diagram demonstrating robust link performance.</p>*
+This repository provides the tools to reproduce the central experimental findings of our work. Below are two key figures that validate our cognitive electronics paradigm: the statistical robustness of the core performance and the exceptional accuracy of our physically-grounded model.
 
-
-
-### Key Experimental Result: Sim-to-Real Correlation
-
-The core of our validation is the exceptional correlation between our Hardware-Aware Training (HAT) simulation and measured silicon performance. The following plot, generated from the code in this repository, demonstrates this key finding.
-
-![Sim-to-Real Correlation Plot](correlation_plot.png) 
-*<p align="center">Figure: Measured vs. Predicted RMS Jitter, demonstrating R² > 0.97.</p>*
+| **Statistical Jitter Validation** | **Sim-to-Real Model Correlation** |
+|:---:|:---:|
+| ![Jitter Histogram Thumbnail](histogram_thumbnail.png) | ![Correlation Plot Thumbnail](correlation_plot.png) |
+| *(a) Statistical validation of the **19.8 fs typical RMS jitter** (TT Corner) from 1,000 measured waveforms. The data confirms a well-behaved Gaussian distribution, matching our manuscript claims.* | *(b) Scatter plot of measured versus HAT-predicted RMS jitter across multiple process corners, demonstrating an **R² > 0.97**. This validates the "digital twin's" high predictive accuracy.* |
 
 ---
 
